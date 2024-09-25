@@ -24,24 +24,22 @@ class MainActivity : ComponentActivity() {
         btnHard = findViewById(R.id.btnHard)
 
         btnLow.setOnClickListener {
-            Toast.makeText(this, "Clic in btn Low", Toast.LENGTH_LONG).show()
-            goToGame("L")
+            // Navegar a LowActivity
+            val intent = Intent(this, LowActivity::class.java)
+            startActivity(intent)
         }
 
-        btnMedium.setOnClickListener{
-            Toast.makeText(this, "Clic in btn Medium", Toast.LENGTH_LONG).show()
-            goToGame("M")
+
+        btnMedium.setOnClickListener {
+            // Navegar a MediumActivity
+            val intent = Intent(this, LowActivity::class.java)
+            startActivity(intent)
         }
 
-        btnHard.setOnClickListener{
-            Toast.makeText(this, "Clic in btn Hard", Toast.LENGTH_LONG).show()
-            goToGame("H")
+        btnHard.setOnClickListener {
+            // Navegar a HighActivity
+            val intent = Intent(this, LowActivity::class.java)
+            startActivity(intent)
         }
-    }
-
-    fun goToGame(level: String){
-        var intent = Intent(this, GameActivity::class.java)
-        intent.putExtra("level", level)
-        startActivity(intent)
     }
 }

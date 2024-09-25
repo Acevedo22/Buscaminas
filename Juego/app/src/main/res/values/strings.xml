@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Buscaminas</string>
+
+    <string name="activity_main_title">Buscaminas</string>
+    <string name="activity_main_txt_level">Choose level</string>
+    <string name="activity_main_btn_level1">Low</string>
+    <string name="activity_main_btn_level2">Medium</string>
+    <string name="activity_main_btn_level3">Hard</string>
 </resources>

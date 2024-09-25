@@ -9,13 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:text="Buscaminas" />
+        android:text="@string/activity_main_title" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Choose a level" />
+        android:text="@string/activity_main_txt_level" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,21 +27,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:text="Low" />
+            android:text="@string/activity_main_btn_level1" />
 
         <Button
             android:id="@+id/btnMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:text="Medium" />
+            android:text="@string/activity_main_btn_level2" />
 
         <Button
             android:id="@+id/btnHard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:text="Hard" />
+            android:text="@string/activity_main_btn_level3" />
     </LinearLayout>
 
 </LinearLayout>
