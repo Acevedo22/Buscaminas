@@ -1,6 +1,6 @@
 package com.example.buscaminas.logic
 
-class Logic () {
+class Logic (var size: Int, var mines: Int) {
 
     class Cell {
         var isRevealed: Boolean = false
@@ -8,10 +8,8 @@ class Logic () {
         var adjacentMines: Int = 0
     }
 
-
-
-    private val BOARD_SIZE = 8
-    private  val MINE_COUNT = 10
+    private val BOARD_SIZE = size
+    private  val MINE_COUNT = mines
 
         val board: Array<Array<Cell>> = Array(BOARD_SIZE) { Array(BOARD_SIZE) { Cell() } }
         var isGameOver = false
