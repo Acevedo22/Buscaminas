@@ -98,7 +98,7 @@ class LowActivity : AppCompatActivity() {
                         button.text = "M"
                     } else {
                         button.text = if (cell.adjacentMines > 0) cell.adjacentMines.toString() else ""
-                        button.setBackgroundColor(ContextCompat.getColor(this, R.color.greenclear))
+                        button.setBackgroundColor(ContextCompat.getColor(this, R.color.Background_Tabla_Game))
                     }
                     button.isEnabled = false
                 }

@@ -2,46 +2,70 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/Background_Interfaze_Title"
+    >
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:text="@string/activity_main_title" />
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:layout_gravity="center"
+        android:text="@string/activity_main_title"
+        />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/activity_main_txt_level" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
-
+        android:orientation="vertical"
+        android:background="@color/Background_Interfaze"
+        >
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/activity_main_txt_level"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:textSize="20sp"
+            android:layout_marginTop="50dp"
+            />
         <Button
             android:id="@+id/btnLow"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:text="@string/activity_main_btn_level1" />
+            android:layout_gravity="center"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="20dp"
+            android:text="@string/activity_main_btn_level1"
+            android:textAlignment="center"
+            android:background="@color/Button_Low"
+            />
 
         <Button
             android:id="@+id/btnMedium"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:text="@string/activity_main_btn_level2" />
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            android:text="@string/activity_main_btn_level2"
+            android:textAlignment="center"
+            android:background="@color/Button_Medium"
+            />
 
         <Button
             android:id="@+id/btnHard"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:text="@string/activity_main_btn_level3" />
+            android:layout_gravity="center"
+            android:text="@string/activity_main_btn_level3"
+            android:textAlignment="center"
+            android:background="@color/Button_Hard"
+            />
     </LinearLayout>
 
 </LinearLayout>
