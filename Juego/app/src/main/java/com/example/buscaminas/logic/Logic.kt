@@ -95,14 +95,20 @@ class Logic(var size: Int, var mines: Int) {
     }
 
     fun isWin(): Boolean {
-        for (row in 0 until BOARD_SIZE) {
-            for (col in 0 until BOARD_SIZE) {
-                val cell = board[row][col]
-                if (!cell.isRevealed && !cell.hasMine) {
+        for (row in board) {
+            for (cell in row) {
+                // Si hay una celda que no tiene mina y no ha sido revelada, el juego no ha terminado
+                if (!cell.hasMine && !cell.isRevealed) {
+                    return false
+                }
+
+                // Si una celda tiene una mina y no ha sido marcada con una bandera, el juego no ha terminado
+                if (cell.hasMine && !cell.isFlagged) {
                     return false
                 }
             }
         }
+        // Si pasa ambas condiciones, entonces el jugador ha ganado
         return true
     }
 }

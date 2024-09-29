@@ -37,7 +37,7 @@
         android:textSize="24sp" />
 
     <GridLayout
-        android:id="@+id/gridLayoutLow"
+        android:id="@+id/gridLayoutMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

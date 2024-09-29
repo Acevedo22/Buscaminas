@@ -1,5 +1,6 @@
 package com.example.buscaminas
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.widget.Button
 import android.widget.GridLayout
@@ -41,7 +42,7 @@ class LowActivity : AppCompatActivity() {
         // Inicializar el juego y el tablero
         game = Logic(BOARD_SIZE, MINES_COUNT)
         buttons = Array(BOARD_SIZE) { Array(BOARD_SIZE) { Button(this) } }
-        val gridLayout: GridLayout = findViewById(R.id.gridLayoutLow)
+        val gridLayout: GridLayout = findViewById(R.id.gridLayoutMedium)
 
         // Crear los botones y agregarlos al GridLayout
         for (row in 0 until BOARD_SIZE) {
@@ -63,12 +64,12 @@ class LowActivity : AppCompatActivity() {
             isFlagMode = !isFlagMode // Alternar el estado del modo de bandera
             if (isFlagMode) {
                 btnCambio.text = "🚩 Modo Bandera" // Cambiar texto cuando se activa el modo bandera
-                btnCambio.setBackgroundColor(ContextCompat.getColor(this, R.color.color_3)) // Cambiar color a rojo
+                btnCambio.setBackgroundColor(ContextCompat.getColor(this, R.color.color_2)) // Cambiar color a amarillo
             } else {
                 btnCambio.text = "👁️ Modo Revelar" // Cambiar texto cuando se vuelve al modo revelar
                 btnCambio.setBackgroundColor(ContextCompat.getColor(this, R.color.green)) // Cambiar color a verde
             }
-            Toast.makeText(this, if (isFlagMode) "Modo Bandera Activado" else "Modo Revelar Activado", Toast.LENGTH_SHORT).show()
+         //   Toast.makeText(this, if (isFlagMode) "Modo Bandera Activado" else "Modo Revelar Activado", Toast.LENGTH_SHORT).show()
         }
 
         // Iniciar el cronómetro
@@ -111,7 +112,7 @@ class LowActivity : AppCompatActivity() {
             if (!cell.isRevealed) { // Solo marcar si la celda no ha sido revelada
                 cell.isFlagged = !cell.isFlagged // Alternar el estado de la bandera
                 buttons[row][col].text = if (cell.isFlagged) "🚩" else "" // Muestra la bandera o quita el texto
-                buttons[row][col].setBackgroundResource(R.color.Background_Tabla_Game) // Cambiar el fondo si está marcada
+
             }
             return // Salir del método
         }
@@ -123,15 +124,18 @@ class LowActivity : AppCompatActivity() {
         }
 
         // Revelar la celda
-        val hitMine = game.revealCell(row, col) // Revelar la celda
+        val hitMine = game.revealCell(row, col)
         if (hitMine) {
-            buttons[row][col].text = "💣" // Mostrar mina
+            buttons[row][col].text = "💣"
             revealAllMines() // Revelar todas las minas
-            Toast.makeText(this, "Game Over!", Toast.LENGTH_SHORT).show() // Mensaje de Game Over
+            Toast.makeText(this, "Game Over!", Toast.LENGTH_SHORT).show()
             stopChronometer() // Detener el cronómetro
         } else {
             updateBoard() // Actualizar el estado del tablero
-            checkWinCondition() // Verificar condición de victoria
+            if (game.isWin()) {
+                Toast.makeText(this, "¡Ganaste!", Toast.LENGTH_SHORT).show()
+                stopChronometer()
+            }
         }
     }
 
@@ -151,54 +155,91 @@ class LowActivity : AppCompatActivity() {
 
     // Método para verificar si el jugador ha ganado
     private fun checkWinCondition() {
-        // Verificar si todas las celdas sin minas han sido reveladas y todas las minas han sido marcadas
-        var allCellsRevealed = true
-        var allMinesFlagged = true
+        var allCellsRevealed = true // Variable para verificar si todas las celdas sin mina han sido reveladas
+        var allFlagsCorrect = true // Variable para verificar si todas las banderas están en las posiciones correctas
 
         for (row in 0 until BOARD_SIZE) {
             for (col in 0 until BOARD_SIZE) {
                 val cell = game.board[row][col]
+
+                // Verificar si hay celdas que deberían estar reveladas pero no lo están
                 if (!cell.hasMine && !cell.isRevealed) {
-                    allCellsRevealed = false // Hay celdas sin minas que no han sido reveladas
+                    allCellsRevealed = false
                 }
-                if (cell.hasMine && !cell.isFlagged) {
-                    allMinesFlagged = false // Hay minas que no han sido marcadas
+
+                // Verificar si las banderas están en las posiciones correctas
+                if (cell.isFlagged != cell.hasMine) {
+                    allFlagsCorrect = false
                 }
             }
         }
 
-        // Si todas las celdas sin minas han sido reveladas y todas las minas han sido marcadas
-        if (allCellsRevealed && allMinesFlagged) {
-            Toast.makeText(this, "¡Has ganado!", Toast.LENGTH_SHORT).show() // Mensaje de victoria
+        // Comprobar si se cumplen ambas condiciones para ganar
+        if (allCellsRevealed && allFlagsCorrect) {
+            Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show() // Mensaje de victoria
             stopChronometer() // Detener el cronómetro
         }
     }
+
 
 
     // Método para actualizar el tablero
     private fun updateBoard() {
         for (row in 0 until BOARD_SIZE) {
             for (col in 0 until BOARD_SIZE) {
-                val cell = game.board[row][col] // Obtener la celda correspondiente
-                val button = buttons[row][col] // Obtener el botón correspondiente
+                val cell = game.board[row][col]
+                val button = buttons[row][col]
 
                 if (cell.isRevealed) {
-                    button.isEnabled = false // Deshabilitar el botón
                     if (cell.hasMine) {
-                        button.text = "M" // Mostrar mina
-                        button.setBackgroundColor(ContextCompat.getColor(this, R.color.color_3)) // Cambiar color a rojo para minas
+                        button.text = "💣"
                     } else {
-                        button.text = if (cell.adjacentMines > 0) {
-                            cell.adjacentMines.toString() // Mostrar cantidad de minas adyacentes
-                        } else {
-                            ""
+                        button.text = if (cell.adjacentMines > 0) cell.adjacentMines.toString() else ""
+                        button.setBackgroundColor(ContextCompat.getColor(this, R.color.Background_Tabla_Game))
+
+                        // Cambiar el color del texto basado en el número de minas adyacentes
+                        when (cell.adjacentMines) {
+                            1 -> {
+                                button.setTextColor(ContextCompat.getColor(this, R.color.color_3))
+                                button.setTypeface(null, Typeface.BOLD) // Texto en negrita
+                            }
+                            2 -> {
+                                button.setTextColor(ContextCompat.getColor(this, R.color.color_4))
+                                button.setTypeface(null, Typeface.BOLD) // Texto en negrita
+                            }
+                            3 -> {
+                                button.setTextColor(ContextCompat.getColor(this, R.color.color_5))
+                                button.setTypeface(null, Typeface.BOLD) // Texto en negrita
+                            }
+                            4 -> {
+                                button.setTextColor(ContextCompat.getColor(this, R.color.color_8))
+                                button.setTypeface(null, Typeface.BOLD) // Texto en negrita
+                            }
+                            5 -> {
+                                button.setTextColor(ContextCompat.getColor(this, R.color.color_7))
+                                button.setTypeface(null, Typeface.BOLD) // Texto en negrita
+                            }
+                            6 -> {
+                                button.setTextColor(ContextCompat.getColor(this, R.color.Background_Interfaze))
+                                button.setTypeface(null, Typeface.BOLD) // Texto en negrita
+                            }
+                            7 -> {
+                                button.setTextColor(ContextCompat.getColor(this, R.color.color_0))
+                                button.setTypeface(null, Typeface.BOLD) // Texto en negrita
+                            }
+                            8 -> {
+                                button.setTextColor(ContextCompat.getColor(this, R.color.color_2))
+                                button.setTypeface(null, Typeface.BOLD) // Texto en negrita
+                            }
                         }
-                        button.setBackgroundColor(ContextCompat.getColor(this, R.color.Background_Tabla_Game)) // Cambiar color de fondo
                     }
+                    button.isEnabled = false
                 }
             }
         }
     }
+
+
 
     // Método para reiniciar el juego
     private fun restartGame() {

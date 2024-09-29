@@ -29,7 +29,6 @@ class MainActivity : ComponentActivity() {
             startActivity(intent)
         }
 
-
         btnMedium.setOnClickListener {
             // Navegar a MediumActivity
             val intent = Intent(this, LowActivity::class.java)
