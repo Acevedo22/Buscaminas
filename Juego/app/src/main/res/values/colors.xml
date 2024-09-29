@@ -8,4 +8,13 @@
     <color name="Background_Interfaze_Title">#B2E0D3</color>
     <color name="Background_Interfaze">#92BCED</color>
     <color name="Background_Tabla_Game">#84EB92</color>
+<color name="color_0">#FFFFFF</color>  <!-- Color para la celda vacía -->
+<color name="color_1">#00FF00</color>  <!-- Color para la celda con 1 mina adyacente -->
+<color name="color_2">#FFFF00</color>  <!-- Color para la celda con 2 minas adyacentes -->
+<color name="color_3">#FF0000</color>  <!-- Color para la celda con 3 minas adyacentes -->
+<color name="color_4">#0000FF</color>  <!-- Color para la celda con 4 minas adyacentes -->
+<color name="color_5">#FF00FF</color>  <!-- Color para la celda con 5 minas adyacentes -->
+<color name="color_6">#00FFFF</color>  <!-- Color para la celda con 6 minas adyacentes -->
+<color name="color_7">#000000</color>  <!-- Color para la celda con 7 minas adyacentes -->
+<color name="color_8">#808080</color>  <!-- Color para la celda con 8 minas adyacentes -->
 </resources>

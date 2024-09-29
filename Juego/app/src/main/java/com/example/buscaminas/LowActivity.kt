@@ -15,25 +15,30 @@ class LowActivity : AppCompatActivity() {
 
     private val BOARD_SIZE = 8  // Definir el tamaño del tablero
     private val MINES_COUNT = 10 // Definir la cantidad de minas del tablero
+
+    // Variables para el juego y la UI
     private lateinit var game: Logic
     private lateinit var btnReset: Button
     private lateinit var btnCambio: Button // Botón para cambiar entre modo
-    private lateinit var buttons: Array<Array<Button>>
+    private lateinit var buttons: Array<Array<Button>> // Array de botones para el tablero
     private var timeInSeconds = 0 // Tiempo transcurrido en segundos
     private lateinit var cronometroTextView: TextView
     private lateinit var handler: Handler
-    private var runnable: Runnable? = null
+    private var runnable: Runnable? = null // Runnable para el cronómetro
     private var isChronometerRunning = false // Variable para controlar el estado del cronómetro
     private var isFlagMode = false // Estado del modo de bandera
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_low)
-        btnReset = findViewById(R.id.btnReset)
-        btnCambio = findViewById(R.id.btnCambio) // Inicializar el botón de cambio
-        cronometroTextView = findViewById(R.id.cronometro)
-        handler = Handler(Looper.getMainLooper())
 
+        // Inicializar las vistas
+        btnReset = findViewById(R.id.btnReset)
+        btnCambio = findViewById(R.id.btnCambio)
+        cronometroTextView = findViewById(R.id.cronometro)
+        handler = Handler(Looper.getMainLooper()) // Inicializar el Handler para el cronómetro
+
+        // Inicializar el juego y el tablero
         game = Logic(BOARD_SIZE, MINES_COUNT)
         buttons = Array(BOARD_SIZE) { Array(BOARD_SIZE) { Button(this) } }
         val gridLayout: GridLayout = findViewById(R.id.gridLayoutLow)
@@ -41,101 +46,155 @@ class LowActivity : AppCompatActivity() {
         // Crear los botones y agregarlos al GridLayout
         for (row in 0 until BOARD_SIZE) {
             for (col in 0 until BOARD_SIZE) {
-                val button = Button(this)
-                button.setOnClickListener {
-                    onCellClicked(row, col)
-                }
-                buttons[row][col] = button
-
-                // Configuración de LayoutParams para cada botón
-                val params = GridLayout.LayoutParams().apply {
-                    width = 100 // Usar ancho flexible
-                    height = 100 // Usar alto flexible
-                    setMargins(5, 5, 5, 5)
-                    rowSpec = GridLayout.spec(row, 1f) // Espacio en la fila
-                    columnSpec = GridLayout.spec(col, 1f) // Espacio en la columna
-                }
-                button.setBackgroundColor(ContextCompat.getColor(this, R.color.green))
-                button.layoutParams = params
-                gridLayout.addView(button)
+                createCellButton(row, col, gridLayout) // Crear botón para cada celda
             }
         }
 
-        btnReset.setOnClickListener {
-            restartGame() // Acción que reinicia el juego
-        }
+        // Configurar botón de reinicio
+        btnReset.setOnClickListener { restartGame() }
 
+        // Establecer texto inicial y color del botón de cambio
+        isFlagMode = false // Iniciar en modo revelar
+        btnCambio.text = "👁️ Modo Revelar" // Texto inicial
+        btnCambio.setBackgroundColor(ContextCompat.getColor(this, R.color.green)) // Color inicial
+
+        // Configurar el listener para el botón de cambio de modo
         btnCambio.setOnClickListener {
-            toggleFlagMode() // Cambia entre los modos
+            isFlagMode = !isFlagMode // Alternar el estado del modo de bandera
+            if (isFlagMode) {
+                btnCambio.text = "🚩 Modo Bandera" // Cambiar texto cuando se activa el modo bandera
+                btnCambio.setBackgroundColor(ContextCompat.getColor(this, R.color.color_3)) // Cambiar color a rojo
+            } else {
+                btnCambio.text = "👁️ Modo Revelar" // Cambiar texto cuando se vuelve al modo revelar
+                btnCambio.setBackgroundColor(ContextCompat.getColor(this, R.color.green)) // Cambiar color a verde
+            }
+            Toast.makeText(this, if (isFlagMode) "Modo Bandera Activado" else "Modo Revelar Activado", Toast.LENGTH_SHORT).show()
         }
 
         // Iniciar el cronómetro
         startChronometer()
     }
 
+    // Método para crear un botón para cada celda
+    private fun createCellButton(row: Int, col: Int, gridLayout: GridLayout) {
+        val button = Button(this).apply {
+            setOnClickListener {
+                onCellClicked(row, col) // Manejar clic en la celda
+            }
+            buttons[row][col] = this // Almacenar el botón en el array
+            setBackgroundColor(ContextCompat.getColor(this@LowActivity, R.color.green)) // Color inicial
+        }
+
+        // Configuración de LayoutParams para cada botón
+        val params = GridLayout.LayoutParams().apply {
+            width = 100 // Usar ancho fijo
+            height = 100 // Usar alto fijo
+            setMargins(5, 5, 5, 5) // Márgenes entre botones
+            rowSpec = GridLayout.spec(row, 1f) // Especificar la fila
+            columnSpec = GridLayout.spec(col, 1f) // Especificar la columna
+        }
+        button.layoutParams = params // Asignar los parámetros de layout al botón
+        gridLayout.addView(button) // Agregar el botón al GridLayout
+    }
+
+    // Método para manejar el clic en una celda
     private fun onCellClicked(row: Int, col: Int) {
         if (game.isGameOver) {
-            Toast.makeText(this, "Game Over", Toast.LENGTH_SHORT).show()
-            // Parar cronómetro cuando pierda
-            stopChronometer()
+            Toast.makeText(this, "Game Over", Toast.LENGTH_SHORT).show() // Mensaje de Game Over
+            stopChronometer() // Detener el cronómetro
             return
         }
 
+        // Comprobar si el modo de bandera está activo
         if (isFlagMode) {
-            // Colocar o quitar una bandera
-            toggleFlag(row, col)
-        } else {
-            val hitMine = game.revealCell(row, col)
+            val cell = game.board[row][col] // Obtener la celda correspondiente
+            if (!cell.isRevealed) { // Solo marcar si la celda no ha sido revelada
+                cell.isFlagged = !cell.isFlagged // Alternar el estado de la bandera
+                buttons[row][col].text = if (cell.isFlagged) "🚩" else "" // Muestra la bandera o quita el texto
+                buttons[row][col].setBackgroundResource(R.color.Background_Tabla_Game) // Cambiar el fondo si está marcada
+            }
+            return // Salir del método
+        }
 
-            if (hitMine) {
-                buttons[row][col].text = "💣" // Cambiar "M" por el ícono de mina
-                Toast.makeText(this, "Game Over!", Toast.LENGTH_SHORT).show()
-                // Parar cronómetro cuando pierda
-                stopChronometer()
-            } else {
-                updateBoard()
-                if (game.isWin()) {
-                    Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show()
-                    // Detener el cronómetro si el jugador gana
-                    stopChronometer()
+        val cell = game.board[row][col] // Obtener la celda correspondiente
+        if (cell.isFlagged) {
+            Toast.makeText(this, "Esta celda está marcada con una bandera", Toast.LENGTH_SHORT).show() // Mensaje si la celda tiene bandera
+            return // Salir del método
+        }
+
+        // Revelar la celda
+        val hitMine = game.revealCell(row, col) // Revelar la celda
+        if (hitMine) {
+            buttons[row][col].text = "💣" // Mostrar mina
+            revealAllMines() // Revelar todas las minas
+            Toast.makeText(this, "Game Over!", Toast.LENGTH_SHORT).show() // Mensaje de Game Over
+            stopChronometer() // Detener el cronómetro
+        } else {
+            updateBoard() // Actualizar el estado del tablero
+            checkWinCondition() // Verificar condición de victoria
+        }
+    }
+
+    // Método para revelar todas las minas en el tablero
+    private fun revealAllMines() {
+        for (row in 0 until BOARD_SIZE) {
+            for (col in 0 until BOARD_SIZE) {
+                val cell = game.board[row][col]
+                if (cell.hasMine) {
+                    buttons[row][col].text = "💣" // Mostrar todas las minas
+                    buttons[row][col].setBackgroundColor(ContextCompat.getColor(this, R.color.color_3)) // Cambiar color a rojo para minas
                 }
             }
         }
     }
 
 
-    private fun toggleFlag(row: Int, col: Int) {
-        val cell = game.board[row][col]
-        if (!cell.isRevealed) {
-            cell.hasMine = !cell.hasMine // Alternar el estado de la bandera
-            buttons[row][col].text = if (cell.hasMine) "🚩" else "" // Mostrar bandera
-            buttons[row][col].setBackgroundColor(
-                if (cell.hasMine) ContextCompat.getColor(this, R.color.green)
-                else ContextCompat.getColor(this, R.color.green)
-            ) // Cambiar color de fondo
-        }
-    }
+    // Método para verificar si el jugador ha ganado
+    private fun checkWinCondition() {
+        // Verificar si todas las celdas sin minas han sido reveladas y todas las minas han sido marcadas
+        var allCellsRevealed = true
+        var allMinesFlagged = true
 
-    private fun toggleFlagMode() {
-        isFlagMode = !isFlagMode
-        btnCambio.text = if (isFlagMode) "Modo Juego" else "Modo Bandera" // Cambiar texto del botón
-        Toast.makeText(this, if (isFlagMode) "Modo Bandera Activado" else "Modo Juego Activado", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun updateBoard() {
         for (row in 0 until BOARD_SIZE) {
             for (col in 0 until BOARD_SIZE) {
                 val cell = game.board[row][col]
-                val button = buttons[row][col]
+                if (!cell.hasMine && !cell.isRevealed) {
+                    allCellsRevealed = false // Hay celdas sin minas que no han sido reveladas
+                }
+                if (cell.hasMine && !cell.isFlagged) {
+                    allMinesFlagged = false // Hay minas que no han sido marcadas
+                }
+            }
+        }
+
+        // Si todas las celdas sin minas han sido reveladas y todas las minas han sido marcadas
+        if (allCellsRevealed && allMinesFlagged) {
+            Toast.makeText(this, "¡Has ganado!", Toast.LENGTH_SHORT).show() // Mensaje de victoria
+            stopChronometer() // Detener el cronómetro
+        }
+    }
+
+
+    // Método para actualizar el tablero
+    private fun updateBoard() {
+        for (row in 0 until BOARD_SIZE) {
+            for (col in 0 until BOARD_SIZE) {
+                val cell = game.board[row][col] // Obtener la celda correspondiente
+                val button = buttons[row][col] // Obtener el botón correspondiente
 
                 if (cell.isRevealed) {
+                    button.isEnabled = false // Deshabilitar el botón
                     if (cell.hasMine) {
-                        button.text = "M"
+                        button.text = "M" // Mostrar mina
+                        button.setBackgroundColor(ContextCompat.getColor(this, R.color.color_3)) // Cambiar color a rojo para minas
                     } else {
-                        button.text = if (cell.adjacentMines > 0) cell.adjacentMines.toString() else ""
-                        button.setBackgroundColor(ContextCompat.getColor(this, R.color.Background_Tabla_Game))
+                        button.text = if (cell.adjacentMines > 0) {
+                            cell.adjacentMines.toString() // Mostrar cantidad de minas adyacentes
+                        } else {
+                            ""
+                        }
+                        button.setBackgroundColor(ContextCompat.getColor(this, R.color.Background_Tabla_Game)) // Cambiar color de fondo
                     }
-                    button.isEnabled = false
                 }
             }
         }
@@ -168,19 +227,19 @@ class LowActivity : AppCompatActivity() {
         if (!isChronometerRunning) {
             runnable = object : Runnable {
                 override fun run() {
-                    timeInSeconds++
-                    val minutes = timeInSeconds / 60
-                    val seconds = timeInSeconds % 60
+                    timeInSeconds++ // Incrementar el tiempo
+                    val minutes = timeInSeconds / 60 // Calcular minutos
+                    val seconds = timeInSeconds % 60 // Calcular segundos
 
                     // Actualizar el TextView con el tiempo formateado
                     cronometroTextView.text = String.format("%02d:%02d", minutes, seconds)
 
                     // Repetir la acción cada segundo
-                    handler.postDelayed(this, 1000)
+                    handler.postDelayed(this, 1000) // Programar el siguiente incremento
                 }
             }
-            handler.post(runnable!!)
-            isChronometerRunning = true
+            handler.post(runnable!!) // Iniciar el runnable
+            isChronometerRunning = true // Marcar cronómetro como en funcionamiento
         }
     }
 
@@ -188,8 +247,8 @@ class LowActivity : AppCompatActivity() {
     private fun stopChronometer() {
         // Detener el cronómetro solo si está en funcionamiento
         if (isChronometerRunning) {
-            runnable?.let { handler.removeCallbacks(it) }
-            isChronometerRunning = false
+            runnable?.let { handler.removeCallbacks(it) } // Eliminar callbacks del runnable
+            isChronometerRunning = false // Marcar cronómetro como detenido
         }
     }
 }
