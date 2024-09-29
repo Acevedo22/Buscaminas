@@ -1,31 +1,47 @@
 package com.example.buscaminas.logic
 
+/**
+ * Clase principal que maneja la lógica del juego Buscaminas.
+ *
+ * @param size Tamaño del tablero (tamaño x tamaño).
+ * @param mines Número de minas en el tablero.
+ */
 class Logic(var size: Int, var mines: Int) {
 
-        class Cell {
+    /**
+     * Clase interna que representa una celda del tablero.
+     *
+     * @property isRevealed Indica si la celda ha sido revelada.
+     * @property hasMine Indica si la celda contiene una mina.
+     * @property isFlagged Indica si la celda está marcada con una bandera.
+     * @property adjacentMines Número de minas adyacentes a la celda.
+     */
+    class Cell {
         var isRevealed: Boolean = false
         var hasMine: Boolean = false
-        var isFlagged: Boolean = false  // Añadir esta propiedad
+        var isFlagged: Boolean = false
         var adjacentMines: Int = 0
-
-        // Otros métodos y propiedades que puedas necesitar
     }
-    private val BOARD_SIZE = size
-    private val MINE_COUNT = mines
-    val board: Array<Array<Cell>> = Array(BOARD_SIZE) { Array(BOARD_SIZE) { Cell() } }
+
+    private val boardSize = size
+    private val mineCount = mines
+    val board: Array<Array<Cell>> = Array(boardSize) { Array(boardSize) { Cell() } }
     var isGameOver = false
 
     init {
-        require(MINE_COUNT <= BOARD_SIZE * BOARD_SIZE) { "Number of mines exceeds board size." }
+        require(mineCount <= boardSize * boardSize) { "El número de minas excede el tamaño del tablero." }
         placeMines()
         calculateAdjacentMines()
     }
 
+    /**
+     * Coloca las minas aleatoriamente en el tablero.
+     */
     private fun placeMines() {
         var placedMines = 0
-        while (placedMines < MINE_COUNT) {
-            val row = (0 until BOARD_SIZE).random()
-            val col = (0 until BOARD_SIZE).random()
+        while (placedMines < mineCount) {
+            val row = (0 until boardSize).random()
+            val col = (0 until boardSize).random()
 
             if (!board[row][col].hasMine) {
                 board[row][col].hasMine = true
@@ -34,9 +50,12 @@ class Logic(var size: Int, var mines: Int) {
         }
     }
 
+    /**
+     * Calcula el número de minas adyacentes para cada celda del tablero.
+     */
     private fun calculateAdjacentMines() {
-        for (row in 0 until BOARD_SIZE) {
-            for (col in 0 until BOARD_SIZE) {
+        for (row in 0 until boardSize) {
+            for (col in 0 until boardSize) {
                 if (!board[row][col].hasMine) {
                     board[row][col].adjacentMines = countAdjacentMines(row, col)
                 }
@@ -44,25 +63,38 @@ class Logic(var size: Int, var mines: Int) {
         }
     }
 
+    /**
+     * Cuenta el número de minas adyacentes a una celda específica.
+     *
+     * @param row Fila de la celda.
+     * @param col Columna de la celda.
+     * @return Número de minas adyacentes.
+     */
     private fun countAdjacentMines(row: Int, col: Int): Int {
         var count = 0
         for (i in -1..1) {
             for (j in -1..1) {
-                if (i == 0 && j == 0) continue // Skip the current cell
+                if (i == 0 && j == 0) continue // Saltar la celda actual
                 val newRow = row + i
                 val newCol = col + j
-                if (newRow in 0 until BOARD_SIZE && newCol in 0 until BOARD_SIZE) {
-                    if (board[newRow][newCol].hasMine) {
-                        count++
-                    }
+                if (newRow in 0 until boardSize && newCol in 0 until boardSize && board[newRow][newCol].hasMine) {
+                    count++
                 }
             }
         }
         return count
     }
 
+    /**
+     * Revela una celda del tablero. Si la celda contiene una mina, el juego termina.
+     * Si no tiene minas adyacentes, se revelan también las celdas adyacentes.
+     *
+     * @param row Fila de la celda.
+     * @param col Columna de la celda.
+     * @return Verdadero si la celda contiene una mina, falso en caso contrario.
+     */
     fun revealCell(row: Int, col: Int): Boolean {
-        if (row !in 0 until BOARD_SIZE || col !in 0 until BOARD_SIZE || board[row][col].isRevealed || isGameOver) {
+        if (row !in 0 until boardSize || col !in 0 until boardSize || board[row][col].isRevealed || isGameOver) {
             return false
         }
 
@@ -81,34 +113,36 @@ class Logic(var size: Int, var mines: Int) {
         return false
     }
 
+    /**
+     * Revela las celdas adyacentes a una celda vacía.
+     *
+     * @param row Fila de la celda.
+     * @param col Columna de la celda.
+     */
     private fun revealAdjacentCells(row: Int, col: Int) {
         for (i in -1..1) {
             for (j in -1..1) {
-                if (i == 0 && j == 0) continue // Skip the current cell
+                if (i == 0 && j == 0) continue // Saltar la celda actual
                 val newRow = row + i
                 val newCol = col + j
-                if (newRow in 0 until BOARD_SIZE && newCol in 0 until BOARD_SIZE && !board[newRow][newCol].isRevealed) {
+                if (newRow in 0 until boardSize && newCol in 0 until boardSize && !board[newRow][newCol].isRevealed) {
                     revealCell(newRow, newCol)
                 }
             }
         }
     }
 
+    /**
+     * Verifica si el jugador ha ganado la partida.
+     * El jugador gana si todas las celdas sin minas están reveladas y todas las celdas con minas están marcadas con bandera.
+     *
+     * @return Verdadero si el jugador ha ganado, falso en caso contrario.
+     */
     fun isWin(): Boolean {
-        for (row in board) {
-            for (cell in row) {
-                // Si hay una celda que no tiene mina y no ha sido revelada, el juego no ha terminado
-                if (!cell.hasMine && !cell.isRevealed) {
-                    return false
-                }
-
-                // Si una celda tiene una mina y no ha sido marcada con una bandera, el juego no ha terminado
-                if (cell.hasMine && !cell.isFlagged) {
-                    return false
-                }
+        return board.all { row ->
+            row.all { cell ->
+                (!cell.hasMine && cell.isRevealed) || (cell.hasMine && cell.isFlagged)
             }
         }
-        // Si pasa ambas condiciones, entonces el jugador ha ganado
-        return true
     }
 }
