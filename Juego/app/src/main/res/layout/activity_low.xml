@@ -37,6 +37,16 @@
         android:textSize="24sp"
         />
 
+    <Button
+        android:id="@+id/btnReset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:background="@color/blue"
+        android:padding="8dp"
+        android:text="Reset Game" />
+
     <GridLayout
         android:id="@+id/gridLayoutLow"
         android:layout_width="wrap_content"
@@ -49,12 +59,11 @@
         android:layout_margin="16dp" />
 
     <Button
-        android:id="@+id/btnReset"
+        android:id="@+id/btnCambio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reset Game"
-        android:layout_gravity="center"
-        android:padding="8dp"
-        android:background="@color/blue"
-        android:layout_marginTop="16dp" />
+        android:layout_gravity="center_horizontal"
+        android:background="@color/Button_Hard"
+        android:text="bandera" />
+
 </LinearLayout>
