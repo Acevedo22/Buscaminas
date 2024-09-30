@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:background="@color/Button_Medium"
+    android:background="@color/Button_Low"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -38,14 +38,14 @@
 
     <GridLayout
         android:id="@+id/gridLayoutMedium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
         android:layout_gravity="center"
         android:layout_margin="16dp"
         android:alignmentMode="alignMargins"
         android:background="@color/Background_Tabla_Game"
-        android:columnCount="8"
-        android:rowCount="8" />
+        android:columnCount="12"
+        android:rowCount="12" />
 
     <Button
         android:id="@+id/btnReset"
