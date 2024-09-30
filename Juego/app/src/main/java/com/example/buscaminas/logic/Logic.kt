@@ -6,7 +6,7 @@ package com.example.buscaminas.logic
  * @param size Tamaño del tablero (tamaño x tamaño).
  * @param mines Número de minas en el tablero.
  */
-class Logic(var size: Int, var mines: Int) {
+class Logic(var size_columns: Int, var size_rows: Int, var mines: Int) {
 
     /**
      * Clase interna que representa una celda del tablero.
@@ -23,13 +23,14 @@ class Logic(var size: Int, var mines: Int) {
         var adjacentMines: Int = 0
     }
 
-    private val boardSize = size
+    private val boardSizeColumns = size_columns
+    private val boardSizeRows = size_rows
     private val mineCount = mines
-    val board: Array<Array<Cell>> = Array(boardSize) { Array(boardSize) { Cell() } }
+    val board: Array<Array<Cell>> = Array(boardSizeColumns) { Array(boardSizeRows) { Cell() } }
     var isGameOver = false
 
     init {
-        require(mineCount <= boardSize * boardSize) { "El número de minas excede el tamaño del tablero." }
+        require(mineCount <= boardSizeColumns * boardSizeRows) { "El número de minas excede el tamaño del tablero." }
         placeMines()
         calculateAdjacentMines()
     }
@@ -40,8 +41,8 @@ class Logic(var size: Int, var mines: Int) {
     private fun placeMines() {
         var placedMines = 0
         while (placedMines < mineCount) {
-            val row = (0 until boardSize).random()
-            val col = (0 until boardSize).random()
+            val row = (0 until boardSizeColumns).random()
+            val col = (0 until boardSizeRows).random()
 
             if (!board[row][col].hasMine) {
                 board[row][col].hasMine = true
@@ -54,8 +55,8 @@ class Logic(var size: Int, var mines: Int) {
      * Calcula el número de minas adyacentes para cada celda del tablero.
      */
     private fun calculateAdjacentMines() {
-        for (row in 0 until boardSize) {
-            for (col in 0 until boardSize) {
+        for (row in 0 until boardSizeColumns) {
+            for (col in 0 until boardSizeRows) {
                 if (!board[row][col].hasMine) {
                     board[row][col].adjacentMines = countAdjacentMines(row, col)
                 }
@@ -77,7 +78,7 @@ class Logic(var size: Int, var mines: Int) {
                 if (i == 0 && j == 0) continue // Saltar la celda actual
                 val newRow = row + i
                 val newCol = col + j
-                if (newRow in 0 until boardSize && newCol in 0 until boardSize && board[newRow][newCol].hasMine) {
+                if (newRow in 0 until boardSizeColumns && newCol in 0 until boardSizeRows && board[newRow][newCol].hasMine) {
                     count++
                 }
             }
@@ -94,7 +95,7 @@ class Logic(var size: Int, var mines: Int) {
      * @return Verdadero si la celda contiene una mina, falso en caso contrario.
      */
     fun revealCell(row: Int, col: Int): Boolean {
-        if (row !in 0 until boardSize || col !in 0 until boardSize || board[row][col].isRevealed || isGameOver) {
+        if (row !in 0 until boardSizeColumns || col !in 0 until boardSizeRows || board[row][col].isRevealed || isGameOver) {
             return false
         }
 
@@ -125,7 +126,7 @@ class Logic(var size: Int, var mines: Int) {
                 if (i == 0 && j == 0) continue // Saltar la celda actual
                 val newRow = row + i
                 val newCol = col + j
-                if (newRow in 0 until boardSize && newCol in 0 until boardSize && !board[newRow][newCol].isRevealed) {
+                if (newRow in 0 until boardSizeColumns && newCol in 0 until boardSizeRows && !board[newRow][newCol].isRevealed) {
                     revealCell(newRow, newCol)
                 }
             }

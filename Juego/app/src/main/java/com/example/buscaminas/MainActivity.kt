@@ -31,13 +31,13 @@ class MainActivity : ComponentActivity() {
 
         btnMedium.setOnClickListener {
             // Navegar a MediumActivity
-            val intent = Intent(this, LowActivity::class.java)
+            val intent = Intent(this, MediumActivity::class.java)
             startActivity(intent)
         }
 
         btnHard.setOnClickListener {
             // Navegar a HighActivity
-            val intent = Intent(this, LowActivity::class.java)
+            val intent = Intent(this, HardActivity::class.java)
             startActivity(intent)
         }
     }

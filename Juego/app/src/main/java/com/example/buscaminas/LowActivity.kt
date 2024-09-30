@@ -11,10 +11,12 @@ import com.example.buscaminas.logic.Logic
 import android.os.Handler
 import android.os.Looper
 import android.widget.TextView
+import com.example.buscaminas.R.id.gridLayoutLow
 
 class LowActivity : AppCompatActivity() {
 
-    private val BOARD_SIZE = 8  // Definir el tamaño del tablero
+    private val BOARD_SIZE_COLUMNS = 8  // Definir el tamaño del tablero columnas
+    private val BOARD_SIZE_ROWS = 8  // Definir el tamaño del tablero filas
     private val MINES_COUNT = 10 // Definir la cantidad de minas del tablero
 
     // Variables para el juego y la UI
@@ -29,6 +31,7 @@ class LowActivity : AppCompatActivity() {
     private var isChronometerRunning = false // Variable para controlar el estado del cronómetro
     private var isFlagMode = false // Estado del modo de bandera
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_low)
@@ -40,13 +43,13 @@ class LowActivity : AppCompatActivity() {
         handler = Handler(Looper.getMainLooper()) // Inicializar el Handler para el cronómetro
 
         // Inicializar el juego y el tablero
-        game = Logic(BOARD_SIZE, MINES_COUNT)
-        buttons = Array(BOARD_SIZE) { Array(BOARD_SIZE) { Button(this) } }
-        val gridLayout: GridLayout = findViewById(R.id.gridLayoutMedium)
+        game = Logic(BOARD_SIZE_COLUMNS, BOARD_SIZE_ROWS, MINES_COUNT)
+        buttons = Array(BOARD_SIZE_COLUMNS) { Array(BOARD_SIZE_ROWS) { Button(this) } }
+        val gridLayout: GridLayout = findViewById(gridLayoutLow)
 
         // Crear los botones y agregarlos al GridLayout
-        for (row in 0 until BOARD_SIZE) {
-            for (col in 0 until BOARD_SIZE) {
+        for (row in 0 until BOARD_SIZE_COLUMNS) {
+            for (col in 0 until BOARD_SIZE_ROWS) {
                 createCellButton(row, col, gridLayout) // Crear botón para cada celda
             }
         }
@@ -141,8 +144,8 @@ class LowActivity : AppCompatActivity() {
 
     // Método para revelar todas las minas en el tablero
     private fun revealAllMines() {
-        for (row in 0 until BOARD_SIZE) {
-            for (col in 0 until BOARD_SIZE) {
+        for (row in 0 until BOARD_SIZE_COLUMNS) {
+            for (col in 0 until BOARD_SIZE_ROWS) {
                 val cell = game.board[row][col]
                 if (cell.hasMine) {
                     buttons[row][col].text = "💣" // Mostrar todas las minas
@@ -158,8 +161,8 @@ class LowActivity : AppCompatActivity() {
         var allCellsRevealed = true // Variable para verificar si todas las celdas sin mina han sido reveladas
         var allFlagsCorrect = true // Variable para verificar si todas las banderas están en las posiciones correctas
 
-        for (row in 0 until BOARD_SIZE) {
-            for (col in 0 until BOARD_SIZE) {
+        for (row in 0 until BOARD_SIZE_COLUMNS) {
+            for (col in 0 until BOARD_SIZE_ROWS) {
                 val cell = game.board[row][col]
 
                 // Verificar si hay celdas que deberían estar reveladas pero no lo están
@@ -185,8 +188,8 @@ class LowActivity : AppCompatActivity() {
 
     // Método para actualizar el tablero
     private fun updateBoard() {
-        for (row in 0 until BOARD_SIZE) {
-            for (col in 0 until BOARD_SIZE) {
+        for (row in 0 until BOARD_SIZE_COLUMNS) {
+            for (col in 0 until BOARD_SIZE_ROWS) {
                 val cell = game.board[row][col]
                 val button = buttons[row][col]
 
@@ -244,11 +247,11 @@ class LowActivity : AppCompatActivity() {
     // Método para reiniciar el juego
     private fun restartGame() {
         // Crear una nueva instancia de Logic para reiniciar el juego
-        game = Logic(BOARD_SIZE, MINES_COUNT)
+        game = Logic(BOARD_SIZE_COLUMNS, BOARD_SIZE_ROWS, MINES_COUNT)
 
         // Limpiar y reiniciar el tablero
-        for (row in 0 until BOARD_SIZE) {
-            for (col in 0 until BOARD_SIZE) {
+        for (row in 0 until BOARD_SIZE_COLUMNS) {
+            for (col in 0 until BOARD_SIZE_ROWS) {
                 buttons[row][col].text = "" // Limpiar el texto de los botones
                 buttons[row][col].isEnabled = true // Habilitar los botones nuevamente
                 buttons[row][col].setBackgroundColor(ContextCompat.getColor(this, R.color.green)) // Restaurar color
